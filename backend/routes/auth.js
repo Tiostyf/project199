@@ -1,103 +1,140 @@
 const express = require('express');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const router = express.Router();
 
-// Register
+// Register user
 router.post('/register', async (req, res) => {
   const { name, email, password } = req.body;
 
+  // Input validation
+  if (!name || !email || !password) {
+    return res.status(400).json({ msg: 'Please enter all fields' });
+  }
+
+  if (password.length < 6) {
+    return res.status(400).json({ msg: 'Password should be at least 6 characters' });
+  }
+
   try {
-    // Check if user exists
     let user = await User.findOne({ email });
     if (user) {
-      return res.status(400).json({ message: 'User already exists' });
+      return res.status(400).json({ msg: 'User already exists' });
     }
 
-    // Create new user
-    user = new User({ name, email, password });
+    user = new User({
+      name,
+      email,
+      password
+    });
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
+
     await user.save();
 
-    // Create JWT payload
     const payload = {
       user: {
-        id: user.id,
-        name: user.name,
-        email: user.email
+        id: user.id
       }
     };
 
-    // Sign token
     jwt.sign(
       payload,
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' },
+      process.env.JWT_SECRET || 'fallbackSecret',
+      { expiresIn: '5 days' },
       (err, token) => {
-        if (err) throw err;
-        res.json({ token, user: payload.user });
+        if (err) {
+          console.error(err.message);
+          return res.status(500).json({ msg: 'Server error' });
+        }
+        res.json({ 
+          token,
+          user: {
+            id: user.id,
+            name: user.name,
+            email: user.email
+          }
+        });
       }
     );
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    res.status(500).json({ msg: 'Server error' });
   }
 });
 
-// Login
+// Login user
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
+  // Input validation
+  if (!email || !password) {
+    return res.status(400).json({ msg: 'Please enter all fields' });
+  }
+
   try {
-    // Check if user exists
     let user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ msg: 'Invalid Credentials' });
     }
 
-    // Check password
-    const isMatch = await user.comparePassword(password);
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ msg: 'Invalid Credentials' });
     }
 
-    // Create JWT payload
     const payload = {
       user: {
-        id: user.id,
-        name: user.name,
-        email: user.email
+        id: user.id
       }
     };
 
-    // Sign token
     jwt.sign(
       payload,
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' },
+      process.env.JWT_SECRET || 'fallbackSecret',
+      { expiresIn: '5 days' },
       (err, token) => {
-        if (err) throw err;
-        res.json({ token, user: payload.user });
+        if (err) {
+          console.error(err.message);
+          return res.status(500).json({ msg: 'Server error' });
+        }
+        res.json({ 
+          token,
+          user: {
+            id: user.id,
+            name: user.name,
+            email: user.email
+          }
+        });
       }
     );
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    res.status(500).json({ msg: 'Server error' });
   }
 });
 
-// Verify token
+// Verify token endpoint
 router.get('/verify', async (req, res) => {
-  const token = req.header('x-auth-token');
-  
-  if (!token) {
-    return res.status(401).json({ message: 'No token' });
-  }
-  
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    res.json({ valid: true, user: decoded.user });
+    const token = req.header('x-auth-token');
+    
+    if (!token) {
+      return res.status(401).json({ valid: false, msg: 'No token provided' });
+    }
+    
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallbackSecret');
+    const user = await User.findById(decoded.user.id).select('-password');
+    
+    if (!user) {
+      return res.status(401).json({ valid: false, msg: 'Token is not valid' });
+    }
+    
+    res.json({ valid: true, user: { id: user.id, name: user.name, email: user.email } });
   } catch (err) {
-    res.status(401).json({ message: 'Token is not valid' });
+    res.status(401).json({ valid: false, msg: 'Token is not valid' });
   }
 });
 
