@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIIMS Portal - Appointments</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .appointment-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+        .status-pending {
+            color: #ff9800;
+            font-weight: bold;
+        }
+        .status-confirmed {
+            color: #4caf50;
+            font-weight: bold;
+        }
+        .status-cancelled {
+            color: #f44336;
+            font-weight: bold;
+        }
+        .appointment-history {
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <div class="logo">AIIMS Patient Portal</div>
+                <ul class="nav-links">
+                    <li><a href="/home">Home</a></li>
+                    <li><a href="/service">Services</a></li>
+                    <li><a href="/review" class="active">Appointments</a></li>
+                    <li><button id="logoutBtn" class="btn btn-logout">Logout</button></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <h1>Book an Appointment</h1>
+            <p>Schedule your visit with our specialist doctors and healthcare providers.</p>
+        </section>
+
+        <section class="form-container">
+            <h2>New Appointment Request</h2>
+            <form id="appointmentForm">
+                <div class="form-group">
+                    <label for="appointmentType">Appointment Type</label>
+                    <select id="appointmentType" name="appointmentType" required>
+                        <option value="">Select Appointment Type</option>
+                        <option value="cardiology">Cardiology</option>
+                        <option value="neurology">Neurology</option>
+                        <option value="orthopedics">Orthopedics</option>
+                        <option value="general">General Medicine</option>
+                        <option value="surgery">Surgery</option>
+                        <option value="pediatrics">Pediatrics</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="preferredDate">Preferred Date</label>
+                    <input type="date" id="preferredDate" name="preferredDate" required min="">
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Medical Concern Description</label>
+                    <textarea id="description" name="description" placeholder="Please describe your symptoms or reason for appointment" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="review">Additional Notes (Optional)</label>
+                    <textarea id="review" name="review" placeholder="Any additional information for the doctor"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="image">Upload Reports (Optional)</label>
+                    <input type="file" id="image" name="image" accept="image/*">
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit Appointment Request</button>
+            </form>
+        </section>
+
+        <section class="appointment-history">
+            <h2>Your Appointment History</h2>
+            <div id="appointmentsList">
+                <p>Loading your appointments...</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2023 AIIMS Patient Portal. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/auth.js"></script>
+    <script src="js/posts.js"></script>
+    <script>
+        // Set minimum date to today
+        document.getElementById('preferredDate').min = new Date().toISOString().split('T')[0];
+    </script>
+</body>
+</html>

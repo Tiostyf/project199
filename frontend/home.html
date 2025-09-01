@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIIMS Portal - Home</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <div class="logo">AIIMS Patient Portal</div>
+                <ul class="nav-links">
+                    <li><a href="/home" class="active">Home</a></li>
+                    <li><a href="/service">Services</a></li>
+                    <li><a href="/review">Appointments</a></li>
+                    <li><button id="logoutBtn" class="btn btn-logout">Logout</button></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <h1>Welcome to AIIMS Patient Portal</h1>
+            <p>Access world-class healthcare services, book appointments, and manage your health records all in one place.</p>
+        </section>
+
+        <section class="features">
+            <h2>Featured Doctors</h2>
+            <div class="doctors-grid">
+                <div class="doctor-card">
+                    <img src="assets/images/doctor1.jpg" alt="Dr. Sharma" class="doctor-image" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRlMGU2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzY5Njk2OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkFJSU1TIERvY3RvcjwvdGV4dD48L3N2Zz4='">
+                    <div class="doctor-info">
+                        <h3>Dr. Rajesh Sharma</h3>
+                        <p class="specialty">Cardiologist</p>
+                        <p class="experience">15+ years experience</p>
+                        <p>MD, DM Cardiology, specializes in interventional cardiology and heart disease prevention.</p>
+                    </div>
+                </div>
+
+                <div class="doctor-card">
+                    <img src="assets/images/doctor2.jpg" alt="Dr. Patel" class="doctor-image" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRlMGU2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzY5Njk2OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkFJSU1TIERvY3RvcjwvdGV4dD48L3N2Zz4='">
+                    <div class="doctor-info">
+                        <h3>Dr. Priya Patel</h3>
+                        <p class="specialty">Neurologist</p>
+                        <p class="experience">12+ years experience</p>
+                        <p>DM Neurology, expert in stroke management and neurological disorders.</p>
+                    </div>
+                </div>
+
+                <div class="doctor-card">
+                    <img src="assets/images/doctor3.jpg" alt="Dr. Singh" class="doctor-image" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRlMGU2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzY5Njk2OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkFJSU1TIERvY3RvcjwvdGV4dD48L3N2Zz4='">
+                    <div class="doctor-info">
+                        <h3>Dr. Amit Singh</h3>
+                        <p class="specialty">Orthopedic Surgeon</p>
+                        <p class="experience">18+ years experience</p>
+                        <p>MS Orthopedics, specializes in joint replacement and sports medicine.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="quick-actions">
+            <h2>Quick Actions</h2>
+            <div class="action-buttons">
+                <a href="/service" class="btn btn-primary">View All Services</a>
+                <a href="/review" class="btn btn-secondary">Book Appointment</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2023 AIIMS Patient Portal. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
