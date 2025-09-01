@@ -4,98 +4,489 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AIIMS Portal - Services</title>
-    <link rel="stylesheet" href="css/style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .section-title {
+            font-size: 28px;
+            margin-bottom: 30px;
+            color: #4a5568;
+            text-align: center;
+        }
+        
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .service-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .service-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .service-info {
+            padding: 20px;
+        }
+        
+        .service-name {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #2d3748;
+        }
+        
+        .service-department {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-weight: 500;
+            font-size: 16px;
+        }
+        
+        .service-description {
+            color: #718096;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .service-features {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .service-features li {
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-size: 14px;
+            list-style-type: none;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .service-features li:before {
+            content: "✓";
+            color: #48bb78;
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        
+        .hospitals-section {
+            margin-top: 50px;
+        }
+        
+        .hospitals-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .hospital-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        
+        .hospital-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .hospital-name {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #2d3748;
+            font-weight: 600;
+        }
+        
+        .hospital-address {
+            color: #718096;
+            margin-bottom: 10px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .hospital-contact {
+            color: #667eea;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .emergency-contact {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #e2e8f0;
+            color: #e53e3e;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .services-grid, .hospitals-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(102, 126, 234, 0.3);
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-    <header class="header">
-        <div class="container">
-            <nav class="nav">
-                <div class="logo">AIIMS Patient Portal</div>
-                <ul class="nav-links">
-                    <li><a href="/home">Home</a></li>
-                    <li><a href="/service" class="active">Services</a></li>
-                    <li><a href="/review">Appointments</a></li>
-                    <li><button id="logoutBtn" class="btn btn-logout">Logout</button></li>
-                </ul>
-            </nav>
+    <nav class="navbar">
+        <h1>AIIMS Patient Portal</h1>
+        <div class="nav-links">
+            <a href="/home">Home</a>
+            <a href="/service">Services</a>
+            <a href="/review">Appointments</a>
+            <button class="logout-btn" id="logoutBtn">Logout</button>
         </div>
-    </header>
+    </nav>
 
-    <main class="container">
-        <section class="hero">
-            <h1>AIIMS Medical Services</h1>
-            <p>Comprehensive healthcare services provided by India's premier medical institution.</p>
-        </section>
-
-        <section class="services">
-            <h2>Our Specialties</h2>
-            <div class="hospitals-grid">
-                <div class="hospital-card">
-                    <img src="assets/images/cardiology.jpg" alt="Cardiology Department" class="hospital-image" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRlMGU2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzY5Njk2OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkNhcmRpb2xvZ3kgRGVwYXJ0bWVudDwvdGV4dD48L3N2Zz4='">
-                    <div class="hospital-info">
-                        <h3>Cardiology Department</h3>
-                        <p class="location">Main Building, Floor 3</p>
-                        <p>Comprehensive heart care including angioplasty, bypass surgery, and cardiac rehabilitation.</p>
-                        <ul class="service-list">
-                            <li>Electrocardiography (ECG)</li>
-                            <li>Echocardiography</li>
-                            <li>Cardiac Catheterization</li>
-                            <li>24/7 Emergency Cardiac Care</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="hospital-card">
-                    <img src="assets/images/neurology.jpg" alt="Neurology Department" class="hospital-image" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRlMGU2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzY5Njk2OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5ldXJvbG9neSBEZXBhcnRtZW50PC90ZXh0Pjwvc3ZnPg=='">
-                    <div class="hospital-info">
-                        <h3>Neurology Department</h3>
-                        <p class="location">Specialty Wing, Floor 2</p>
-                        <p>Advanced treatment for neurological disorders including stroke, epilepsy, and Parkinson's disease.</p>
-                        <ul class="service-list">
-                            <li>EEG and EMG Services</li>
-                            <li>Stroke Unit</li>
-                            <li>Epilepsy Monitoring</li>
-                            <li>Neurological Rehabilitation</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="hospital-card">
-                    <img src="assets/images/orthopedics.jpg" alt="Orthopedics Department" class="hospital-image" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRlMGU2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzY5Njk2OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk9ydGhvcGVkaWNzIERlcGFydG1lbnQ8L3RleHQ+PC9zdmc+'">
-                    <div class="hospital-info">
-                        <h3>Orthopedics Department</h3>
-                        <p class="location">Surgical Building, Floor 1</p>
-                        <p>Comprehensive bone and joint care including trauma surgery and joint replacement.</p>
-                        <ul class="service-list">
-                            <li>Joint Replacement Surgery</li>
-                            <li>Arthroscopy</li>
-                            <li>Spinal Surgery</li>
-                            <li>Sports Medicine</li>
-                        </ul>
-                    </div>
+    <div class="container">
+        <h2 class="section-title">Our Medical Services</h2>
+        
+        <div class="services-grid" id="servicesGrid">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>Loading services...</p>
+            </div>
+        </div>
+        
+        <div class="hospitals-section">
+            <h2 class="section-title">AIIMS Hospitals Network</h2>
+            <div class="hospitals-list" id="hospitalsList">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading hospital information...</p>
                 </div>
             </div>
-        </section>
-
-        <section class="emergency-services">
-            <h2>Emergency Services</h2>
-            <div class="emergency-info">
-                <div class="emergency-card">
-                    <h3>24/7 Emergency Department</h3>
-                    <p>Our emergency department is staffed round the clock with specialized doctors and equipped with state-of-the-art technology to handle all medical emergencies.</p>
-                    <p class="emergency-contact">Emergency Hotline: <strong>+91-11-26588741</strong></p>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2023 AIIMS Patient Portal. All rights reserved.</p>
         </div>
-    </footer>
+    </div>
 
-    <script src="js/auth.js"></script>
-    <script src="js/main.js"></script>
+    <script>
+        // Check authentication status
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/auth/verify');
+                if (!response.ok) {
+                    window.location.href = '/login';
+                    return false;
+                }
+                return true;
+            } catch (error) {
+                window.location.href = '/login';
+                return false;
+            }
+        }
+        
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                await fetch('/api/auth/logout', { method: 'POST' });
+                window.location.href = '/login';
+            } catch (error) {
+                console.error('Logout error:', error);
+                window.location.href = '/login';
+            }
+        });
+        
+        // Sample services data
+        const services = [
+            {
+                name: "Cardiology",
+                department: "Heart Care Department",
+                image: "/assets/images/cardiology.jpg",
+                description: "Comprehensive cardiac care with state-of-the-art technology for diagnosis and treatment of heart conditions.",
+                features: [
+                    "Cardiac catheterization and angiography",
+                    "Echocardiography and stress testing",
+                    "Angioplasty and stenting procedures",
+                    "Cardiac rehabilitation programs",
+                    "Pacemaker and ICD implantation",
+                    "24/7 cardiac emergency care"
+                ]
+            },
+            {
+                name: "Neurology",
+                department: "Brain and Nerve Care",
+                image: "/assets/images/neurology.jpg",
+                description: "Advanced neurological care for complex brain and nerve disorders with cutting-edge treatment options.",
+                features: [
+                    "EEG, EMG and NCV testing",
+                    "Stroke treatment and rehabilitation",
+                    "Epilepsy and seizure management",
+                    "Movement disorders treatment",
+                    "Neurological rehabilitation",
+                    "Sleep disorder management"
+                ]
+            },
+            {
+                name: "Orthopedics",
+                department: "Bone and Joint Care",
+                image: "/assets/images/orthopedics.jpg",
+                description: "Specialized care for musculoskeletal conditions, injuries, and joint replacement surgeries.",
+                features: [
+                    "Joint replacement surgery (Hip, Knee, Shoulder)",
+                    "Arthroscopic surgery and sports medicine",
+                    "Fracture management and trauma care",
+                    "Spinal surgery and rehabilitation",
+                    "Pediatric orthopedics",
+                    "Physiotherapy and rehabilitation"
+                ]
+            },
+            {
+                name: "Pediatrics",
+                department: "Child Healthcare",
+                image: "/assets/images/pediatrics.jpg",
+                description: "Comprehensive healthcare services for children from newborns to adolescents.",
+                features: [
+                    "Well-baby and vaccination clinics",
+                    "Developmental pediatrics",
+                    "Pediatric emergency care",
+                    "Neonatal intensive care",
+                    "Child nutrition counseling",
+                    "Pediatric surgery"
+                ]
+            },
+            {
+                name: "Oncology",
+                department: "Cancer Care",
+                image: "/assets/images/oncology.jpg",
+                description: "Multidisciplinary cancer treatment with advanced chemotherapy, radiation, and surgical oncology.",
+                features: [
+                    "Medical oncology and chemotherapy",
+                    "Radiation therapy",
+                    "Surgical oncology",
+                    "Palliative care services",
+                    "Cancer screening programs",
+                    "Supportive care and counseling"
+                ]
+            },
+            {
+                name: "Gynecology",
+                department: "Women's Health",
+                image: "/assets/images/gynecology.jpg",
+                description: "Comprehensive women's healthcare services including obstetrics, gynecology, and fertility treatments.",
+                features: [
+                    "Obstetric care and delivery",
+                    "Gynecological surgery",
+                    "Fertility treatments",
+                    "Menopause management",
+                    "Minimally invasive surgery",
+                    "Preventive health screenings"
+                ]
+            }
+        ];
+        
+        // Sample hospitals data
+        const hospitals = [
+            {
+                name: "AIIMS New Delhi",
+                address: "Ansari Nagar, New Delhi - 110029, India",
+                contact: "+91-11-26588500 / 26588700",
+                emergency: "+91-11-26588500 Ext. 4099"
+            },
+            {
+                name: "AIIMS Jhajjar",
+                address: "Basthi Village, Jhajjar - 124105, Haryana, India",
+                contact: "+91-1251-220311 / 220312",
+                emergency: "+91-1251-220313"
+            },
+            {
+                name: "AIIMS Rishikesh",
+                address: "Virbhadra, Rishikesh - 249203, Uttarakhand, India",
+                contact: "+91-135-2461100 / 2461101",
+                emergency: "+91-135-2461109"
+            },
+            {
+                name: "AIIMS Bhubaneswar",
+                address: "Sijua, Patrapada, Bhubaneswar - 751019, Odisha, India",
+                contact: "+91-674-2476000 / 2476001",
+                emergency: "+91-674-2476099"
+            },
+            {
+                name: "AIIMS Patna",
+                address: "Phulwari Sharif, Patna - 801507, Bihar, India",
+                contact: "+91-612-2451000 / 2451001",
+                emergency: "+91-612-2451099"
+            },
+            {
+                name: "AIIMS Raipur",
+                address: "Tatibandh, GE Road, Raipur - 492099, Chhattisgarh, India",
+                contact: "+91-771-2575000 / 2575001",
+                emergency: "+91-771-2575099"
+            }
+        ];
+        
+        // Load services and hospitals on page load
+        async function loadContent() {
+            const isAuthenticated = await checkAuth();
+            if (!isAuthenticated) return;
+            
+            // Simulate loading delay
+            setTimeout(() => {
+                loadServices();
+                loadHospitals();
+            }, 1000);
+        }
+        
+        function loadServices() {
+            const servicesGrid = document.getElementById('servicesGrid');
+            servicesGrid.innerHTML = '';
+            
+            services.forEach(service => {
+                const serviceCard = document.createElement('div');
+                serviceCard.className = 'service-card';
+                
+                const featuresList = service.features.map(feature => 
+                    `<li>${feature}</li>`
+                ).join('');
+                
+                serviceCard.innerHTML = `
+                    <img src="${service.image}" alt="${service.name}" class="service-image" onerror="this.src='https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=80'">
+                    <div class="service-info">
+                        <h3 class="service-name">${service.name}</h3>
+                        <p class="service-department">${service.department}</p>
+                        <p class="service-description">${service.description}</p>
+                        <ul class="service-features">
+                            ${featuresList}
+                        </ul>
+                    </div>
+                `;
+                
+                servicesGrid.appendChild(serviceCard);
+            });
+        }
+        
+        function loadHospitals() {
+            const hospitalsList = document.getElementById('hospitalsList');
+            hospitalsList.innerHTML = '';
+            
+            hospitals.forEach(hospital => {
+                const hospitalCard = document.createElement('div');
+                hospitalCard.className = 'hospital-card';
+                
+                hospitalCard.innerHTML = `
+                    <h3 class="hospital-name">${hospital.name}</h3>
+                    <p class="hospital-address">${hospital.address}</p>
+                    <p class="hospital-contact">Contact: ${hospital.contact}</p>
+                    <p class="emergency-contact">Emergency: ${hospital.emergency}</p>
+                `;
+                
+                hospitalsList.appendChild(hospitalCard);
+            });
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', loadContent);
+    </script>
 </body>
 </html>

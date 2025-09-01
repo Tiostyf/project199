@@ -1,141 +1,144 @@
-// Check if user is already logged in
-document.addEventListener('DOMContentLoaded', function() {
-  checkExistingAuth();
-});
+const API_BASE = window.location.origin + '/api';
 
-async function checkExistingAuth() {
-  const token = localStorage.getItem('token');
-  if (token) {
-    try {
-      const data = await safeFetch('/api/auth/verify', {
-        headers: {
-          'x-auth-token': token
-        }
-      });
-      
-      if (data.valid) {
-        window.location.href = '/home';
-      } else {
-        clearAuthData();
-      }
-    } catch (error) {
-      clearAuthData();
-    }
-  }
-}
-
-// Safe fetch function to handle both JSON and text responses
+// Utility function for API calls
 async function safeFetch(url, options = {}) {
-  const response = await fetch(url, options);
-  
-  // Check if response is JSON
-  const contentType = response.headers.get('content-type');
-  let data;
-  
-  if (contentType && contentType.includes('application/json')) {
-    data = await response.json();
-  } else {
-    const text = await response.text();
-    throw new Error(text || 'Server error');
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+      ...options,
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Something went wrong');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('API call failed:', error);
+    throw error;
   }
-  
-  if (!response.ok) {
-    throw new Error(data.msg || data.error || `Request failed with status ${response.status}`);
-  }
-  
-  return data;
 }
 
-// Handle registration
-document.getElementById('registerForm')?.addEventListener('submit', async function(e) {
+// Handle user registration
+async function handleRegister(e) {
   e.preventDefault();
   
   const name = document.getElementById('name').value;
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
   
-  // Basic validation
-  if (!name || !email || !password) {
-    showMessage('Please fill in all fields', 'error');
-    return;
-  }
+  const errorDiv = document.getElementById('error-message');
+  const successDiv = document.getElementById('success-message');
   
-  if (password.length < 6) {
-    showMessage('Password must be at least 6 characters', 'error');
-    return;
-  }
+  errorDiv.textContent = '';
+  successDiv.textContent = '';
   
   try {
-    const data = await safeFetch('/api/auth/register', {
+    const data = await safeFetch(`${API_BASE}/auth/register`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ name, email, password })
+      body: JSON.stringify({ name, email, password }),
     });
     
-    setAuthData(data.token, data.user);
-    window.location.href = '/home';
+    successDiv.textContent = 'Registration successful! Redirecting to login...';
+    
+    // Store token and user data
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+    
+    // Redirect to login after short delay
+    setTimeout(() => {
+      window.location.href = '/login.html';
+    }, 1500);
   } catch (error) {
-    showMessage(error.message, 'error');
+    errorDiv.textContent = error.message;
   }
-});
+}
 
-// Handle login
-document.getElementById('loginForm')?.addEventListener('submit', async function(e) {
+// Handle user login
+async function handleLogin(e) {
   e.preventDefault();
   
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
   
-  // Basic validation
-  if (!email || !password) {
-    showMessage('Please fill in all fields', 'error');
-    return;
-  }
+  const errorDiv = document.getElementById('error-message');
+  errorDiv.textContent = '';
   
   try {
-    const data = await safeFetch('/api/auth/login', {
+    const data = await safeFetch(`${API_BASE}/auth/login`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ email, password }),
     });
     
-    setAuthData(data.token, data.user);
-    window.location.href = '/home';
+    // Store token and user data
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+    
+    // Redirect to home page
+    window.location.href = '/home.html';
   } catch (error) {
-    showMessage(error.message, 'error');
+    errorDiv.textContent = error.message;
   }
-});
-
-// Helper functions
-function setAuthData(token, user) {
-  localStorage.setItem('token', token);
-  localStorage.setItem('user', JSON.stringify(user));
 }
 
-function clearAuthData() {
+// Check if user is authenticated
+function checkAuth() {
+  const token = localStorage.getItem('token');
+  const user = localStorage.getItem('user');
+  
+  if (!token || !user) {
+    // Redirect to login if not authenticated
+    window.location.href = '/login.html';
+    return null;
+  }
+  
+  return JSON.parse(user);
+}
+
+// Handle user logout
+function handleLogout() {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
+  window.location.href = '/login.html';
 }
 
-function showMessage(message, type) {
-  // Remove any existing messages
-  const existingMessages = document.querySelectorAll('.message');
-  existingMessages.forEach(msg => msg.remove());
-  
-  const messageDiv = document.createElement('div');
-  messageDiv.className = `message ${type}`;
-  messageDiv.textContent = message;
-  
-  const form = document.querySelector('.auth-form');
-  if (form) {
-    form.insertBefore(messageDiv, form.firstChild);
-    
-    setTimeout(() => {
-      messageDiv.remove();
-    }, 5000);
+// Initialize auth functionality when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  // Register form
+  const registerForm = document.getElementById('register-form');
+  if (registerForm) {
+    registerForm.addEventListener('submit', handleRegister);
   }
-}
+  
+  // Login form
+  const loginForm = document.getElementById('login-form');
+  if (loginForm) {
+    loginForm.addEventListener('submit', handleLogin);
+  }
+  
+  // Logout button
+  const logoutBtn = document.getElementById('logout-btn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', handleLogout);
+  }
+  
+  // Check authentication for protected pages
+  const protectedPages = ['home', 'service', 'review'];
+  const currentPage = window.location.pathname.split('/').pop().replace('.html', '');
+  
+  if (protectedPages.includes(currentPage)) {
+    const user = checkAuth();
+    if (user) {
+      // Display user info if available
+      const userInfoElement = document.getElementById('user-info');
+      if (userInfoElement) {
+        userInfoElement.textContent = `Welcome, ${user.name}`;
+      }
+    }
+  }
+});

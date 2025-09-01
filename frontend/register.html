@@ -4,53 +4,188 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AIIMS Portal - Register</title>
-    <link rel="stylesheet" href="css/auth.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+        }
+        
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #5a67d8;
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+        
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .error {
+            color: #e53e3e;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .success {
+            color: #38a169;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-    <div class="auth-container">
-        <div class="auth-card">
-            <div class="auth-header">
-                <h1>Create Account</h1>
-                <p>Register to access AIIMS medical services</p>
+    <div class="container">
+        <h2>Create Account</h2>
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" required>
             </div>
-            
-            <form id="registerForm" class="auth-form">
-                <div class="form-group">
-                    <label for="name">Full Name</label>
-                    <input type="text" id="name" name="name" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required minlength="6">
-                </div>
-                
-                <div class="form-group">
-                    <label for="confirmPassword">Confirm Password</label>
-                    <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6">
-                </div>
-                
-                <button type="submit" class="btn btn-primary">Create Account</button>
-            </form>
-            
-            <div class="auth-footer">
-                <p>Already have an account? <a href="/login">Login here</a></p>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required>
             </div>
-        </div>
-        
-        <div class="auth-background">
-            <div class="background-content">
-                <h2>All India Institute of Medical Sciences</h2>
-                <p>Join thousands of patients receiving exceptional care</p>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" minlength="6" required>
             </div>
-        </div>
+            <button type="submit" id="submitBtn">Register</button>
+            <div class="login-link">
+                Already have an account? <a href="/login">Login here</a>
+            </div>
+            <div id="message" class="error"></div>
+        </form>
     </div>
 
-    <script src="js/auth.js"></script>
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const messageEl = document.getElementById('message');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            // Show loading state
+            submitBtn.innerHTML = '<span class="loading"></span> Registering...';
+            submitBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    messageEl.textContent = 'Registration successful! Redirecting...';
+                    messageEl.className = 'success';
+                    
+                    // Redirect to home page after successful registration
+                    setTimeout(() => {
+                        window.location.href = '/home';
+                    }, 1500);
+                } else {
+                    messageEl.textContent = data.message || 'Registration failed';
+                    messageEl.className = 'error';
+                }
+            } catch (error) {
+                messageEl.textContent = 'Network error. Please try again.';
+                messageEl.className = 'error';
+            } finally {
+                // Reset button state
+                submitBtn.innerHTML = 'Register';
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
 </body>
 </html>

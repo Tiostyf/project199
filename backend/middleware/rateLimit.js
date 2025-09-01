@@ -1,51 +1,48 @@
 const rateLimit = require('express-rate-limit');
-const slowDown = require('express-slow-down');
 
-// General rate limiter for all requests
+// General rate limiting for all requests
 const generalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: {
-    error: 'Too many requests from this IP, please try again after 15 minutes'
-  },
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
+  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100, // limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later',
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
-// Auth-specific rate limiter (stricter limits)
+// Rate limiting for authentication routes
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // limit each IP to 5 login attempts per windowMs
-  message: {
-    error: 'Too many login attempts, please try again after 15 minutes'
-  },
-  skipSuccessfulRequests: true, // Don't count successful requests
+  max: parseInt(process.env.AUTH_LIMIT_MAX_ATTEMPTS) || 5, // limit each IP to 5 login attempts per windowMs
+  message: 'Too many authentication attempts, please try again later',
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
-// Speed limiter for auth routes (slows down responses after first request)
-const authSpeedLimiter = slowDown({
+// Slower rate limiting after initial auth attempts
+const authSpeedLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  delayAfter: 2, // allow 2 requests at full speed
-  delayMs: 500, // begin adding 500ms of delay per request above delayAfter
-  maxDelayMs: 20000, // maximum delay of 20 seconds
+  max: 10, // limit each IP to 10 requests per windowMs
+  message: 'Too many authentication requests, please try again later',
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
-// Rate limiter for appointment submissions
+// Rate limiting for appointment creation
 const appointmentLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 3, // limit each IP to 3 appointment requests per hour
-  message: {
-    error: 'Too many appointment requests, please try again after an hour'
-  },
+  max: parseInt(process.env.APPOINTMENT_LIMIT_MAX_REQUESTS) || 3, // limit each IP to 3 appointment requests per hour
+  message: 'Too many appointment requests, please try again later',
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
-// Rate limiter for post creation
+// Rate limiting for post creation
 const postLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 5, // limit each IP to 5 post creations per hour
-  message: {
-    error: 'Too many posts created, please try again after an hour'
-  },
+  message: 'Too many posts created, please try again later',
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
 module.exports = {
