@@ -1,29 +1,24 @@
 {
-  "name": "aiims-portal",
+  "name": "aiims-fullstack-app",
   "version": "1.0.0",
-  "description": "AIIMS Doctor Portal with appointment booking",
-  "main": "backend/server.js",
+  "description": "AIIMS appointment system with Express backend and frontend",
   "scripts": {
-    "start": "node backend/server.js",
-    "dev": "nodemon backend/server.js",
-    "build": "echo 'Build completed'"
+    "start": "cd backend && npm start",
+    "dev": "cd backend && npm run dev",
+    "install-all": "npm install && cd backend && npm install",
+    "build": "cd backend && npm install",
+    "render-build": "npm run install-all"
   },
-  "dependencies": {
-    "express": "^4.18.2",
-    "mongoose": "^7.5.0",
-    "bcryptjs": "^2.4.3",
-    "jsonwebtoken": "^9.0.2",
-    "multer": "^1.4.5-lts.1",
-    "dotenv": "^16.3.1",
-    "cors": "^2.8.5",
-    "path": "^0.12.7",
-    "express-rate-limit": "^6.8.1",
-    "express-slow-down": "^1.5.0"
-  },
-  "devDependencies": {
-    "nodemon": "^3.0.1"
-  },
-  "keywords": ["aiims", "doctors", "appointment"],
-  "author": "Your Name",
-  "license": "MIT"
+  "keywords": [
+    "express",
+    "mongodb",
+    "authentication",
+    "healthcare",
+    "aiims"
+  ],
+  "author": "Developer",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  }
 }
