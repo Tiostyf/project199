@@ -16,12 +16,10 @@ async function checkExistingAuth() {
       if (data.valid) {
         window.location.href = '/home';
       } else {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        clearAuthData();
       }
     } catch (error) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      clearAuthData();
     }
   }
 }
@@ -76,8 +74,7 @@ document.getElementById('registerForm')?.addEventListener('submit', async functi
       body: JSON.stringify({ name, email, password })
     });
     
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('user', JSON.stringify(data.user));
+    setAuthData(data.token, data.user);
     window.location.href = '/home';
   } catch (error) {
     showMessage(error.message, 'error');
@@ -106,13 +103,23 @@ document.getElementById('loginForm')?.addEventListener('submit', async function(
       body: JSON.stringify({ email, password })
     });
     
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('user', JSON.stringify(data.user));
+    setAuthData(data.token, data.user);
     window.location.href = '/home';
   } catch (error) {
     showMessage(error.message, 'error');
   }
 });
+
+// Helper functions
+function setAuthData(token, user) {
+  localStorage.setItem('token', token);
+  localStorage.setItem('user', JSON.stringify(user));
+}
+
+function clearAuthData() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+}
 
 function showMessage(message, type) {
   // Remove any existing messages
@@ -124,9 +131,11 @@ function showMessage(message, type) {
   messageDiv.textContent = message;
   
   const form = document.querySelector('.auth-form');
-  form.insertBefore(messageDiv, form.firstChild);
-  
-  setTimeout(() => {
-    messageDiv.remove();
-  }, 5000);
+  if (form) {
+    form.insertBefore(messageDiv, form.firstChild);
+    
+    setTimeout(() => {
+      messageDiv.remove();
+    }, 5000);
+  }
 }
